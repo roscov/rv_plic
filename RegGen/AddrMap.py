@@ -139,7 +139,7 @@ class AddrMap:
     out_string += "  always_comb begin : begin_gen_reg_mux_{}\n".format(self.name)
     out_string += self.gen_verilog_bus_defaults()
     out_string += self.gen_verilog_bus_logic()
-    out_string += "  end : end_gen_reg_mux_{}".format(self.name)
+    out_string += "  end"
     return out_string
 
   def gen_verilog_header(self):
