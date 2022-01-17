@@ -17,20 +17,27 @@ class AddrMap:
     self.protocol = protocol
     self.addr_len = addr_len
 
-  def newRegPort(self, name, baseaddr, width, access : Access, description, replication=0, replication_offset=1):
-    self.ports.append(PortEntry(name, replication, width, access))
-    reg_cuts = ceil(width / self.access_width)
+  def newRegPort(self, name, baseaddr, port_width, access : Access, description, replication=0, replication_offset=1, reserved_area=0, reserved_replicas=0):
+    self.ports.append(PortEntry(name, replication, port_width, access))
+    reg_cuts = ceil(port_width / self.access_width) if port_width > ( reserved_area * self.access_width ) else reserved_area
     for cut_entry in range(0, reg_cuts):
       entry_offset = cut_entry*self.access_width
-      entry_width  = width - entry_offset if (width - entry_offset) < self.access_width else self.access_width
+      entry_width  = port_width - entry_offset if (port_width - entry_offset) < self.access_width else self.access_width
       entry_baseaddr = baseaddr + cut_entry*(clog2(self.access_width) - 1)
-      if replication == 0 :
-        self.addrmap.append(AddrMapEntry(addr=entry_baseaddr, name=name, description=description, access=access, width=entry_width, index=None, offset=entry_offset, addr_len=self.addr_len))
+      replication_size = replication if replication > reserved_replicas else reserved_replicas
+      if replication_size == 0 :
+        if cut_entry < ceil(port_width / self.access_width) :
+          self.addrmap.append(AddrMapEntry(addr=entry_baseaddr, name=name, description=description, access=access, width=entry_width, index=None, offset=entry_offset, addr_len=self.addr_len))
+        else:
+          self.addrmap.append(AddrMapEntry(addr=entry_baseaddr, name=name, description=description, access=Access.RESERVED, width=self.access_width, index=None, addr_len=self.addr_len))
       else:
         assert replication_offset >= 1, "cannot replicate register entry less than once"
-        for replica in range(0, replication):
+        for replica in range(0, replication_size):
           replica_baseaddr = entry_baseaddr + replica*replication_offset
-          self.addrmap.append(AddrMapEntry(addr=replica_baseaddr, name=name, description=description, access=access, width=entry_width, index=replica, offset=entry_offset, addr_len=self.addr_len))
+          if (cut_entry < ceil(port_width / self.access_width)) and (replica < replication) :
+            self.addrmap.append(AddrMapEntry(addr=replica_baseaddr, name=name, description=description, access=access, width=entry_width, index=replica, offset=entry_offset, addr_len=self.addr_len))
+          else:
+            self.addrmap.append(AddrMapEntry(addr=replica_baseaddr, name=name, description=description, access=Access.RESERVED, width=self.access_width, index=replica, addr_len=self.addr_len))
 
 
   def gen_verilog_portlist(self):

@@ -1,6 +1,7 @@
 
 __all__ = ['AddrMapEntry']
 
+from os import access
 from .utils import Access
 
 class AddrMapEntry:
@@ -30,17 +31,22 @@ class AddrMapEntry:
 
   def gen_read_logic(self, signal):
     out_string = ""
-    if self.access != ( Access.WO or Access.RESERVED ):
+    if ( self.access == Access.RO ) or ( self.access == Access.RW ):
       out_string += "          // read logic for {}\n".format(self.name)
       out_string += "          {}'h{:<8}: begin\n".format(self.addr_len, hex(self.addr)[2:])
       out_string += "            {}[{}:0] = {};\n".format( signal, self.width-1, self.gen_read_accessor())
       out_string += "            {}_re_o{} = 1'b1;\n".format(self.name, self.indexer)
       out_string += "          end\n"
+    elif self.access == Access.RESERVED:
+      out_string += "          // read reserved (no error) logic for {}\n".format(self.name)
+      out_string += "          {}'h{:<8}: begin\n".format(self.addr_len, hex(self.addr)[2:])
+      out_string += "            {}[{}:0] = '0;\n".format( signal, self.width-1)
+      out_string += "          end\n"
     return out_string
 
   def gen_write_logic(self, signal):
     out_string = ""
-    if self.access !=  ( Access.RO or Access.RESERVED ):
+    if self.access == ( self.access == Access.WO ) or ( self.access == Access.RW ):
       out_string  = "          // write logic for {}\n".format(self.name)
       out_string += "          {}'h{:<8}: begin\n".format(self.addr_len, hex(self.addr)[2:])
       out_string += "            {} = {}[{}:0];\n".format(self.gen_write_accessor(), signal, self.width-1)

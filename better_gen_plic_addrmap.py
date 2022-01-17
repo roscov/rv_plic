@@ -72,17 +72,17 @@ if __name__ == "__main__":
 
   # add priority fields
   #addrmap.addEntries(nr_src_eff, priorityAddr, "prio", "source {} priority", Access.RW, priority_width)
-  addrmap.newRegPort("prio", priorityAddr(0), priority_width, Access.RW, "source priority", nr_src_eff, 4)
+  addrmap.newRegPort("prio", priorityAddr(0), priority_width, Access.RW, "source priority", replication=nr_src_eff, replication_offset=4)
   # pending array
   #addrmap.addEntry(pendingAddr, "ip", "pending array", Access.RO, nr_src_eff)
   addrmap.newRegPort("ip", pendingAddr(0), nr_src_eff, Access.RO, "pending array")
   # # generate per target interrupt enables
   #addrmap.addEntries(nr_target, enableAddr,  "Target {} interrupt enable", Access.RW, nr_src_eff)
-  addrmap.newRegPort("ie", enableAddr(0), nr_src_eff, Access.RW, "Target interrupt enable", nr_target, enableOffset(1))
+  addrmap.newRegPort("ie", enableAddr(0), nr_src_eff, Access.RW, "Target interrupt enable", replication=nr_target, replication_offset=enableOffset(1))
   # # generate claim/complete registers + thresholds
   #addrmap.addEntries(nr_target, hartAddr, "threshold", "Hart {}  priority threshold", Access.RW, priority_width)
-  addrmap.newRegPort("threshold", hartAddr(0), priority_width, Access.RW, "Hart priority threshold", nr_target, hartOffset(1))
+  addrmap.newRegPort("threshold", hartAddr(0), priority_width, Access.RW, "Hart priority threshold", replication=nr_target, replication_offset=hartOffset(1))
   #addrmap.addEntries(nr_target, hartCC, "cc", "Hart {} claim/complete", Access.RW, source_width)
-  addrmap.newRegPort("cc", hartCC(0), source_width, Access.RW, "Hart claim/complete", nr_target, 0x1000)
+  addrmap.newRegPort("cc", hartCC(0), source_width, Access.RW, "Hart claim/complete", replication=nr_target, replication_offset=0x1000)
 
   print(addrmap.gen_verilog_module())
