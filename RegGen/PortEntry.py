@@ -46,9 +46,13 @@ class PortEntry:
 
   def gen_defaults(self):
     out_string = "    // reg {} defaults\n".format(self.name)
-    if self.access != Access.RO:
+    if self.access == Access.WO:
       out_string += "    {}_o    = '0;\n".format(self.name)
       out_string += "    {}_we_o = '0;\n".format(self.name)
-    if self.access != Access.WO:
+    if self.access == Access.RO:
+      out_string += "    {}_re_o = '0;\n".format(self.name)
+    if self.access == Access.RW:
+      out_string += "    {0}_o    = {0}_i;\n".format(self.name)
+      out_string += "    {}_we_o = '0;\n".format(self.name)
       out_string += "    {}_re_o = '0;\n".format(self.name)
     return out_string

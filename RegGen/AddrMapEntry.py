@@ -30,20 +30,20 @@ class AddrMapEntry:
 
   def gen_read_logic(self, signal):
     out_string = ""
-    if self.access != Access.WO:
+    if self.access != ( Access.WO or Access.RESERVED ):
       out_string += "          // read logic for {}\n".format(self.name)
       out_string += "          {}'h{:<8}: begin\n".format(self.addr_len, hex(self.addr)[2:])
-      out_string += "            {}[{}:0] = {};\n".format( signal, self.width-1, self.gen_write_accessor())
+      out_string += "            {}[{}:0] = {};\n".format( signal, self.width-1, self.gen_read_accessor())
       out_string += "            {}_re_o{} = 1'b1;\n".format(self.name, self.indexer)
       out_string += "          end\n"
     return out_string
 
   def gen_write_logic(self, signal):
     out_string = ""
-    if self.access != Access.RO:
+    if self.access !=  ( Access.RO or Access.RESERVED ):
       out_string  = "          // write logic for {}\n".format(self.name)
       out_string += "          {}'h{:<8}: begin\n".format(self.addr_len, hex(self.addr)[2:])
-      out_string += "            {} = {}[{}:0];\n".format(self.gen_read_accessor(), signal, self.width-1)
+      out_string += "            {} = {}[{}:0];\n".format(self.gen_write_accessor(), signal, self.width-1)
       out_string += "            {}_we_o{} = 1'b1;\n".format(self.name, self.indexer)
       out_string += "          end\n"
     return out_string

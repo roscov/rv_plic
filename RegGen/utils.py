@@ -9,3 +9,4 @@ class Access(Enum):
   RO = 1
   RW = 2
   WO = 3
+  RESERVED = 4

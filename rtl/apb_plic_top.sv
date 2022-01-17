@@ -149,7 +149,6 @@ module apb_plic_top #(
         threshold_q[i] <= threshold_we_o[i] ? threshold_o[i] : threshold_q[i];
         ie_q[i] <= ie_we_o[i] ? ie_o[i][N_SOURCE:1] : ie_q[i];
       end
-
     end
   end
 endmodule
