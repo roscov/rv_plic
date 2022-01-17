@@ -83,6 +83,6 @@ if __name__ == "__main__":
   #addrmap.addEntries(nr_target, hartAddr, "threshold", "Hart {}  priority threshold", Access.RW, priority_width)
   addrmap.newRegPort("threshold", hartAddr(0), priority_width, Access.RW, "Hart priority threshold", nr_target, hartOffset(1))
   #addrmap.addEntries(nr_target, hartCC, "cc", "Hart {} claim/complete", Access.RW, source_width)
-  addrmap.newRegPort("cc", hartCC(0), source_width, Access.RW, "Hart claim/complete", nr_target, 4)
+  addrmap.newRegPort("cc", hartCC(0), source_width, Access.RW, "Hart claim/complete", nr_target, 0x1000)
 
   print(addrmap.gen_verilog_module())
