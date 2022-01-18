@@ -15,10 +15,14 @@ if __name__ == "__main__":
   parser.add_argument("-t", "--nr_targets", metavar="NrTargets", help="number of targets (default 2)", default=2)
   parser.add_argument("-s", "--nr_sources", metavar="NrSources", help="number of sources (default 30)", default=30)
   parser.add_argument("-p", "--max_priority", metavar="MaxPriority", help="maximum number of priority (default 7)", default=7)
+  parser.add_argument("-b", "--plic_base", metavar="PlicBaseAddress", help="base address of PLIC", default="C000000")
   parser.add_argument("--apb3", help="generate reg map with apb3 interface instead", default=False, action='store_true')
   args = parser.parse_args()
 
   plic_base = 0xC000000
+
+  if args.plic_base:
+    plic_base = int(args.plic_base, base=16)
 
   if args.nr_targets:
     nr_target = int(args.nr_targets)
